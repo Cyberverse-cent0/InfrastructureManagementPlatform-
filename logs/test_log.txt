@@ -1,0 +1,8 @@
+Fri Jul 24 01:14:57 2026
+ Logger initialized
+[2026-07-24 01:14:57] [INFO] Testing info message
+[2026-07-24 01:14:57] [WARNING] Testing warning message
+[2026-07-24 01:14:57] [ERROR] Testing error message
+[2026-07-24 01:14:57] [DEBUG] Testing debug message
+Fri Jul 24 01:14:57 2026
+ Logger destroyed

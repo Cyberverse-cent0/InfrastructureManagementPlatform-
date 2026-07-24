@@ -1,0 +1,140 @@
+Fri Jul 24 01:20:49 2026
+ Logger initialized
+[2026-07-24 01:20:49] [INFO] Testing info message with icon
+[2026-07-24 01:20:49] [WARNING] Testing warning message with icon
+[2026-07-24 01:20:49] [ERROR] Testing error message with icon
+[2026-07-24 01:20:49] [DEBUG] Testing debug message with icon
+[2026-07-24 01:20:49] [INFO] Testing success message with icon
+[2026-07-24 01:20:49] [ERROR] Testing critical message with icon
+[2026-07-24 01:20:49] [DEBUG] Debug message using macro
+[2026-07-24 01:20:49] [INFO] Info message using macro
+[2026-07-24 01:20:49] [INFO] Success message using macro
+[2026-07-24 01:20:49] [WARNING] Warning message using macro
+[2026-07-24 01:20:49] [ERROR] Error message using macro
+[2026-07-24 01:20:49] [ERROR] Critical message using macro
+[2026-07-24 01:20:49] [INFO] [MAIN_MODULE:main:42] Message with context
+[2026-07-24 01:20:49] [INFO] [MAIN_MODULE:main:42] Success with context
+[2026-07-24 01:20:49] [ERROR] [MAIN_MODULE:main:42] Error with context
+[2026-07-24 01:20:49] [DEBUG] [test_improved.c:main:43] Debug message with automatic location
+[2026-07-24 01:20:49] [INFO] [test_improved.c:main:44] Info message with automatic location
+[2026-07-24 01:20:49] [INFO] [test_improved.c:main:45] Success message with automatic location
+[2026-07-24 01:20:49] [WARNING] [test_improved.c:main:46] Warning message with automatic location
+[2026-07-24 01:20:49] [ERROR] [test_improved.c:main:47] Error message with automatic location
+[2026-07-24 01:20:49] [DEBUG] [DATABASE:main:50] Database connection attempt
+[2026-07-24 01:20:49] [INFO] [DATABASE:main:51] Database connected successfully
+[2026-07-24 01:20:49] [INFO] [AUTH:main:52] User authenticated
+[2026-07-24 01:20:49] [WARNING] [NETWORK:main:53] High latency detected
+[2026-07-24 01:20:49] [ERROR] [CONFIG:main:54] Configuration file not found
+[2026-07-24 01:20:49] [INFO] This should only appear in file
+[2026-07-24 01:20:49] [INFO] This should appear in both console and file
+[2026-07-24 01:20:49] [INFO] Message without colors
+[2026-07-24 01:20:49] [INFO] Message with colors restored
+[2026-07-24 01:20:49] [INFO] [SYSTEM:main:80] Thread count detected
+[2026-07-24 01:20:49] [INFO] [SYSTEM:main:83] Threading support verified
+[2026-07-24 01:20:49] [INFO] [DATABASE:main:91] Database initialized successfully
+Fri Jul 24 01:20:49 2026
+ Logger destroyed
+Fri Jul 24 01:49:03 2026
+ Logger initialized
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+[2026-07-24 01:49:03] [INFO] Synchronous log message
+Fri Jul 24 01:49:03 2026
+ Logger destroyed
