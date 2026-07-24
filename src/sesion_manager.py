@@ -12,6 +12,8 @@ import secrets
 from datetime import datetime, timedelta
 from typing import Dict, Optional, Any
 from pathlib import Path
+import ctypes                   #imcplent  global c libabar for user in python 
+
 
 # Configuration
 SESSION_TIMEOUT_HOURS = 24

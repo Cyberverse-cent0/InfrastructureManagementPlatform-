@@ -23,6 +23,8 @@ endif
 SRC_DIR = scipts
 INSTALLER_DIR = installer
 BACKEND_DIR = src/backend/core
+DATABASE_DIR = src/backend/database
+TABLES_DIR = src/backend/database/tables
 BUILD_DIR = build
 TEST_DIR = test
 
@@ -35,6 +37,21 @@ SMART_LOGGER_SRC = $(SRC_DIR)/smart_logger.c
 ASYNC_LOGGER_SRC = $(SRC_DIR)/async_logger.c
 INSTALLER_SRC = $(INSTALLER_DIR)/postgress_setup.c
 HTTP_SERVER_SRC = $(BACKEND_DIR)/http_server.c
+DATABASE_SRC = $(DATABASE_DIR)/user_databse.c
+INVENTORY_TABLES_SRC = $(DATABASE_DIR)/inventory_tables.c
+PRODUCTS_SRC = $(TABLES_DIR)/products.c
+CATEGORIES_SRC = $(TABLES_DIR)/categories.c
+SUPPLIERS_SRC = $(TABLES_DIR)/suppliers.c
+LOCATIONS_SRC = $(TABLES_DIR)/locations.c
+UNITS_SRC = $(TABLES_DIR)/units.c
+INVENTORY_SRC = $(TABLES_DIR)/inventory.c
+STOCK_MOVEMENTS_SRC = $(TABLES_DIR)/stock_movements.c
+PRODUCT_SUPPLIERS_SRC = $(TABLES_DIR)/product_suppliers.c
+PURCHASE_ORDERS_SRC = $(TABLES_DIR)/purchase_orders.c
+PURCHASE_ORDER_ITEMS_SRC = $(TABLES_DIR)/purchase_order_items.c
+SALES_SRC = $(TABLES_DIR)/sales.c
+SALE_ITEMS_SRC = $(TABLES_DIR)/sale_items.c
+CUSTOMERS_SRC = $(TABLES_DIR)/customers.c
 
 # Object files
 LOGGER_OBJ = $(BUILD_DIR)/logger.o
@@ -45,6 +62,21 @@ SMART_LOGGER_OBJ = $(BUILD_DIR)/smart_logger.o
 ASYNC_LOGGER_OBJ = $(BUILD_DIR)/async_logger.o
 INSTALLER_OBJ = $(BUILD_DIR)/postgress_setup.o
 HTTP_SERVER_OBJ = $(BUILD_DIR)/http_server.o
+DATABASE_OBJ = $(BUILD_DIR)/database.o
+INVENTORY_TABLES_OBJ = $(BUILD_DIR)/inventory_tables.o
+PRODUCTS_OBJ = $(BUILD_DIR)/products.o
+CATEGORIES_OBJ = $(BUILD_DIR)/categories.o
+SUPPLIERS_OBJ = $(BUILD_DIR)/suppliers.o
+LOCATIONS_OBJ = $(BUILD_DIR)/locations.o
+UNITS_OBJ = $(BUILD_DIR)/units.o
+INVENTORY_OBJ = $(BUILD_DIR)/inventory.o
+STOCK_MOVEMENTS_OBJ = $(BUILD_DIR)/stock_movements.o
+PRODUCT_SUPPLIERS_OBJ = $(BUILD_DIR)/product_suppliers.o
+PURCHASE_ORDERS_OBJ = $(BUILD_DIR)/purchase_orders.o
+PURCHASE_ORDER_ITEMS_OBJ = $(BUILD_DIR)/purchase_order_items.o
+SALES_OBJ = $(BUILD_DIR)/sales.o
+SALE_ITEMS_OBJ = $(BUILD_DIR)/sale_items.o
+CUSTOMERS_OBJ = $(BUILD_DIR)/customers.o
 
 # Targets
 INSTALLER_TARGET = $(BUILD_DIR)/installer$(EXE_EXT)
@@ -53,17 +85,24 @@ PRINT_FUNC_TARGET = $(BUILD_DIR)/print_test$(EXE_EXT)
 HTTP_SERVER_TARGET = $(BUILD_DIR)/http_server$(EXE_EXT)
 NETWORK_TEST_TARGET = $(BUILD_DIR)/test_network$(EXE_EXT)
 
-# PostgreSQL library (optional)
-ifdef USE_POSTGRES
-    POSTGRES_LIBS = -lpq
-    POSTGRES_FLAGS = -DUSE_POSTGRES
-else
-    POSTGRES_LIBS =
-    POSTGRES_FLAGS =
-endif
+# PostgreSQL library (required for inventory system)
+POSTGRES_LIBS = -lpq
+POSTGRES_FLAGS = -DUSE_POSTGRES
 
 # Default target
 all: directories $(INSTALLER_TARGET)
+
+# Inventory tables target
+inventory_tables: directories $(BUILD_DIR)/inventory_tables$(EXE_EXT)
+
+$(BUILD_DIR)/inventory_tables$(EXE_EXT): $(INVENTORY_TABLES_OBJ) $(PRODUCTS_OBJ) $(CATEGORIES_OBJ) $(SUPPLIERS_OBJ) $(LOCATIONS_OBJ) $(UNITS_OBJ) $(INVENTORY_OBJ) $(STOCK_MOVEMENTS_OBJ) $(PRODUCT_SUPPLIERS_OBJ) $(PURCHASE_ORDERS_OBJ) $(PURCHASE_ORDER_ITEMS_OBJ) $(SALES_OBJ) $(SALE_ITEMS_OBJ) $(CUSTOMERS_OBJ) $(DATABASE_OBJ) $(LOGGER_OBJ) $(PRINT_FUNC_OBJ)
+	$(CC) $(CFLAGS) $(POSTGRES_FLAGS) -o $@ $^ $(PLATFORM_LIBS) $(POSTGRES_LIBS)
+
+# Test inventory tables
+test_inventory: directories $(BUILD_DIR)/test_inventory$(EXE_EXT)
+
+$(BUILD_DIR)/test_inventory$(EXE_EXT): test_inventory_tables.c $(INVENTORY_TABLES_OBJ) $(PRODUCTS_OBJ) $(CATEGORIES_OBJ) $(SUPPLIERS_OBJ) $(LOCATIONS_OBJ) $(UNITS_OBJ) $(INVENTORY_OBJ) $(STOCK_MOVEMENTS_OBJ) $(PRODUCT_SUPPLIERS_OBJ) $(PURCHASE_ORDERS_OBJ) $(PURCHASE_ORDER_ITEMS_OBJ) $(SALES_OBJ) $(SALE_ITEMS_OBJ) $(CUSTOMERS_OBJ) $(DATABASE_OBJ) $(LOGGER_OBJ) $(PRINT_FUNC_OBJ)
+	$(CC) $(CFLAGS) $(POSTGRES_FLAGS) -o $@ $< $(INVENTORY_TABLES_OBJ) $(PRODUCTS_OBJ) $(CATEGORIES_OBJ) $(SUPPLIERS_OBJ) $(LOCATIONS_OBJ) $(UNITS_OBJ) $(INVENTORY_OBJ) $(STOCK_MOVEMENTS_OBJ) $(PRODUCT_SUPPLIERS_OBJ) $(PURCHASE_ORDERS_OBJ) $(PURCHASE_ORDER_ITEMS_OBJ) $(SALES_OBJ) $(SALE_ITEMS_OBJ) $(CUSTOMERS_OBJ) $(DATABASE_OBJ) $(LOGGER_OBJ) $(PRINT_FUNC_OBJ) $(PLATFORM_LIBS) $(POSTGRES_LIBS)
 
 # Create build directories
 directories:
@@ -148,6 +187,52 @@ $(ASYNC_LOGGER_OBJ): $(ASYNC_LOGGER_SRC) $(SRC_DIR)/async_logger.h
 $(HTTP_SERVER_OBJ): $(HTTP_SERVER_SRC) $(BACKEND_DIR)/http_server.h $(LOGGER_OBJ) $(PRINT_FUNC_OBJ)
 	$(CC) $(CFLAGS) -c $< -o $@
 
+# Database object files
+$(DATABASE_OBJ): $(DATABASE_SRC) $(DATABASE_DIR)/global_lib.h
+	$(CC) $(CFLAGS) $(POSTGRES_FLAGS) -c $< -o $@
+
+$(INVENTORY_TABLES_OBJ): $(INVENTORY_TABLES_SRC) $(DATABASE_DIR)/inventory_tables.h
+	$(CC) $(CFLAGS) $(POSTGRES_FLAGS) -c $< -o $@
+
+$(PRODUCTS_OBJ): $(PRODUCTS_SRC) $(DATABASE_DIR)/global_lib.h
+	$(CC) $(CFLAGS) $(POSTGRES_FLAGS) -c $< -o $@
+
+$(CATEGORIES_OBJ): $(CATEGORIES_SRC) $(DATABASE_DIR)/global_lib.h
+	$(CC) $(CFLAGS) $(POSTGRES_FLAGS) -c $< -o $@
+
+$(SUPPLIERS_OBJ): $(SUPPLIERS_SRC) $(DATABASE_DIR)/global_lib.h
+	$(CC) $(CFLAGS) $(POSTGRES_FLAGS) -c $< -o $@
+
+$(LOCATIONS_OBJ): $(LOCATIONS_SRC) $(DATABASE_DIR)/global_lib.h
+	$(CC) $(CFLAGS) $(POSTGRES_FLAGS) -c $< -o $@
+
+$(UNITS_OBJ): $(UNITS_SRC) $(DATABASE_DIR)/global_lib.h
+	$(CC) $(CFLAGS) $(POSTGRES_FLAGS) -c $< -o $@
+
+$(INVENTORY_OBJ): $(INVENTORY_SRC) $(DATABASE_DIR)/global_lib.h
+	$(CC) $(CFLAGS) $(POSTGRES_FLAGS) -c $< -o $@
+
+$(STOCK_MOVEMENTS_OBJ): $(STOCK_MOVEMENTS_SRC) $(DATABASE_DIR)/global_lib.h
+	$(CC) $(CFLAGS) $(POSTGRES_FLAGS) -c $< -o $@
+
+$(PRODUCT_SUPPLIERS_OBJ): $(PRODUCT_SUPPLIERS_SRC) $(DATABASE_DIR)/global_lib.h
+	$(CC) $(CFLAGS) $(POSTGRES_FLAGS) -c $< -o $@
+
+$(PURCHASE_ORDERS_OBJ): $(PURCHASE_ORDERS_SRC) $(DATABASE_DIR)/global_lib.h
+	$(CC) $(CFLAGS) $(POSTGRES_FLAGS) -c $< -o $@
+
+$(PURCHASE_ORDER_ITEMS_OBJ): $(PURCHASE_ORDER_ITEMS_SRC) $(DATABASE_DIR)/global_lib.h
+	$(CC) $(CFLAGS) $(POSTGRES_FLAGS) -c $< -o $@
+
+$(SALES_OBJ): $(SALES_SRC) $(DATABASE_DIR)/global_lib.h
+	$(CC) $(CFLAGS) $(POSTGRES_FLAGS) -c $< -o $@
+
+$(SALE_ITEMS_OBJ): $(SALE_ITEMS_SRC) $(DATABASE_DIR)/global_lib.h
+	$(CC) $(CFLAGS) $(POSTGRES_FLAGS) -c $< -o $@
+
+$(CUSTOMERS_OBJ): $(CUSTOMERS_SRC) $(DATABASE_DIR)/global_lib.h
+	$(CC) $(CFLAGS) $(POSTGRES_FLAGS) -c $< -o $@
+
 # Debug build
 debug: CFLAGS += $(DEBUG_FLAGS)
 debug: clean all
@@ -212,6 +297,8 @@ help:
 	@echo "  all           - Build the installer (default)"
 	@echo "  installer     - Build the installer"
 	@echo "  http_server   - Build the HTTP server"
+	@echo "  inventory_tables - Build inventory tables system"
+	@echo "  test_inventory - Build and test inventory tables"
 	@echo "  test_network  - Build and test network interface discovery"
 	@echo "  test_logging  - Build and test server logging functionality"
 	@echo "  test_http     - Build and test HTTP parsing functionality"
@@ -224,5 +311,5 @@ help:
 	@echo "  install_deps  - Install system dependencies"
 	@echo "  help          - Show this help message"
 
-.PHONY: all installer http_server test_network test_logging test_http test_routing debug release test_compile test_run clean depedecy_manager install_deps frontend frontend_run backend backend_run help directories
+.PHONY: all installer http_server inventory_tables test_inventory test_network test_logging test_http test_routing debug release test_compile test_run clean depedecy_manager install_deps frontend frontend_run backend backend_run help directories
 	

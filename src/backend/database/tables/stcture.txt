@@ -1,0 +1,15 @@
+                    INVENTORY SYSTEM
+                           │
+        ┌──────────────────┼──────────────────┐
+        │                  │                  │
+        ▼                  ▼                  ▼
+    Identity           Inventory          Operations
+        │                  │                  │
+    users              products           purchases
+    profiles            categories         sales
+    roles               suppliers          stock_movements
+    permissions         locations          transfers
+    sessions            warehouses
+                        stock
+                        batches
+                        units
