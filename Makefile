@@ -27,6 +27,9 @@ DATABASE_DIR = src/backend/database
 TABLES_DIR = src/backend/database/tables
 BUILD_DIR = build
 TEST_DIR = test
+FRONTEND_DIR = frontend
+ANDROID_APP_DIR = $(FRONTEND_DIR)/android_app
+ANDROID_MOBILE_DIR = $(ANDROID_APP_DIR)/artifacts/infrastructure-mobile
 
 # Source files
 LOGGER_SRC = $(SRC_DIR)/logger.c
@@ -253,6 +256,16 @@ clean:
 	$(RM) $(BUILD_DIR)/*.o
 	$(RM) $(BUILD_DIR)/*$(EXE_EXT)
 	$(RM) $(BUILD_DIR)/*.log
+	@echo "Cleaning C build artifacts..."
+	@echo "Cleaning frontend artifacts..."
+	cd $(FRONTEND_DIR) && rm -rf .next node_modules
+	@echo "Cleaning Android app artifacts..."
+	cd $(ANDROID_APP_DIR) && rm -rf node_modules .local
+	cd $(ANDROID_MOBILE_DIR) && rm -rf node_modules .expo dist
+	@echo "Cleaning core backend artifacts..."
+	cd core_backend && $(MAKE) clean || true
+	@echo "Cleaning microservices artifacts..."
+	cd microservices_backend/services/inventory_service && $(MAKE) clean || true
 
 # Dependency management (example for package managers)
 depedecy_manager:
@@ -263,53 +276,120 @@ depedecy_manager:
 
 # Install dependencies
 install_deps:
+	@echo "Installing system dependencies..."
 ifdef OS
-	@echo "Please install PostgreSQL manually on Windows"
+	@echo "Please install PostgreSQL, Node.js, and pnpm manually on Windows"
 else
 	@if command -v pacman >/dev/null 2>&1; then \
 		echo "Detected Arch Linux"; \
-		sudo pacman -S --needed postgresql; \
+		sudo pacman -S --needed postgresql nodejs pnpm gcc make; \
 	elif command -v apt-get >/dev/null 2>&1; then \
 		echo "Detected Debian/Ubuntu"; \
-		sudo apt-get update && sudo apt-get install -y libpq-dev; \
+		sudo apt-get update; \
+		sudo apt-get install -y postgresql libpq-dev nodejs npm gcc make; \
+		npm install -g pnpm; \
 	else \
-		echo "Unknown package manager. Please install PostgreSQL manually."; \
+		echo "Unknown package manager. Please install PostgreSQL, Node.js, pnpm, gcc, and make manually."; \
 	fi
+	@echo "System dependencies installation complete"
+	@echo "Please run 'make android_install' to install Android app dependencies"
 endif
 
-# Frontend placeholder
-frontend:
-	@echo "Frontend compilation not yet implemented"
+# Frontend targets
+frontend: frontend_web frontend_android
+	@echo "Frontend compilation complete"
 
-frontend_run:
-	@echo "Frontend run not yet implemented"
+frontend_web:
+	@echo "Building Next.js web frontend..."
+	cd $(FRONTEND_DIR) && npm install && npm run build
 
-# Backend placeholder
-backend:
-	@echo "Backend compilation not yet implemented"
+frontend_run_web:
+	@echo "Running Next.js web frontend..."
+	cd $(FRONTEND_DIR) && npm run dev
 
-backend_run:
-	@echo "Backend run not yet implemented"
+# Android app targets
+frontend_android: android_install android_build
+	@echo "Android app compilation complete"
+
+android_install:
+	@echo "Installing Android app dependencies..."
+	cd $(ANDROID_APP_DIR) && pnpm install
+
+android_build:
+	@echo "Building Android app..."
+	cd $(ANDROID_MOBILE_DIR) && pnpm run build
+
+android_run:
+	@echo "Running Android app in development mode..."
+	cd $(ANDROID_MOBILE_DIR) && pnpm run dev
+
+android_serve:
+	@echo "Serving Android app..."
+	cd $(ANDROID_MOBILE_DIR) && pnpm run serve
+
+android_typecheck:
+	@echo "Type checking Android app..."
+	cd $(ANDROID_APP_DIR) && pnpm run typecheck
+
+android_clean:
+	@echo "Cleaning Android app build artifacts..."
+	cd $(ANDROID_APP_DIR) && rm -rf node_modules .local
+	cd $(ANDROID_MOBILE_DIR) && rm -rf node_modules .expo dist
+
+# Backend targets
+backend: core_backend microservices
+	@echo "Backend compilation complete"
+
+core_backend:
+	@echo "Building core backend..."
+	cd core_backend && $(MAKE)
+
+core_backend_run:
+	@echo "Running core backend..."
+	cd core_backend && $(MAKE) run
+
+microservices:
+	@echo "Building microservices..."
+	cd microservices_backend/services/inventory_service && $(MAKE)
+
+microservices_run:
+	@echo "Running microservices..."
+	cd microservices_backend/services/inventory_service && $(MAKE) run
 
 # Help target
 help:
 	@echo "Available targets:"
-	@echo "  all           - Build the installer (default)"
-	@echo "  installer     - Build the installer"
-	@echo "  http_server   - Build the HTTP server"
-	@echo "  inventory_tables - Build inventory tables system"
-	@echo "  test_inventory - Build and test inventory tables"
-	@echo "  test_network  - Build and test network interface discovery"
-	@echo "  test_logging  - Build and test server logging functionality"
-	@echo "  test_http     - Build and test HTTP parsing functionality"
-	@echo "  test_routing  - Build and test routing system"
-	@echo "  debug         - Build with debug symbols"
-	@echo "  release       - Build optimized release"
-	@echo "  test_compile  - Compile test programs"
-	@echo "  test_run      - Compile and run tests"
-	@echo "  clean         - Remove build artifacts"
-	@echo "  install_deps  - Install system dependencies"
-	@echo "  help          - Show this help message"
+	@echo "  all                - Build the installer (default)"
+	@echo "  installer          - Build the installer"
+	@echo "  http_server        - Build the HTTP server"
+	@echo "  inventory_tables   - Build inventory tables system"
+	@echo "  test_inventory     - Build and test inventory tables"
+	@echo "  test_network       - Build and test network interface discovery"
+	@echo "  test_logging       - Build and test server logging functionality"
+	@echo "  test_http          - Build and test HTTP parsing functionality"
+	@echo "  test_routing       - Build and test routing system"
+	@echo "  debug              - Build with debug symbols"
+	@echo "  release            - Build optimized release"
+	@echo "  test_compile       - Compile test programs"
+	@echo "  test_run           - Compile and run tests"
+	@echo "  clean              - Remove build artifacts"
+	@echo "  install_deps       - Install system dependencies"
+	@echo "  frontend           - Build all frontend components (web + android)"
+	@echo "  frontend_web       - Build Next.js web frontend"
+	@echo "  frontend_run_web   - Run Next.js web frontend in development mode"
+	@echo "  frontend_android   - Build Android app"
+	@echo "  android_install    - Install Android app dependencies"
+	@echo "  android_build      - Build Android app"
+	@echo "  android_run        - Run Android app in development mode"
+	@echo "  android_serve      - Serve Android app"
+	@echo "  android_typecheck  - Type check Android app"
+	@echo "  android_clean      - Clean Android app build artifacts"
+	@echo "  backend            - Build all backend components (core + microservices)"
+	@echo "  core_backend       - Build core backend"
+	@echo "  core_backend_run   - Run core backend"
+	@echo "  microservices      - Build microservices"
+	@echo "  microservices_run  - Run microservices"
+	@echo "  help               - Show this help message"
 
-.PHONY: all installer http_server inventory_tables test_inventory test_network test_logging test_http test_routing debug release test_compile test_run clean depedecy_manager install_deps frontend frontend_run backend backend_run help directories
+.PHONY: all installer http_server inventory_tables test_inventory test_network test_logging test_http test_routing debug release test_compile test_run clean depedecy_manager install_deps frontend frontend_web frontend_run_web frontend_android android_install android_build android_run android_serve android_typecheck android_clean backend core_backend core_backend_run microservices microservices_run help directories
 	

@@ -11,11 +11,18 @@ import type {
 } from '@/types';
 
 // API Configuration
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+const GATEWAY_URL = process.env.NEXT_PUBLIC_GATEWAY_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const CORE_BACKEND_URL = process.env.NEXT_PUBLIC_CORE_BACKEND_URL || 'http://localhost:8080';
+const INVENTORY_SERVICE_URL = process.env.NEXT_PUBLIC_INVENTORY_SERVICE_URL || 'http://localhost:8081';
+const SERVICE_DISCOVERY_ENABLED = process.env.NEXT_PUBLIC_SERVICE_DISCOVERY_ENABLED === 'true';
+
+// Use gateway as primary API endpoint
+const API_BASE_URL = GATEWAY_URL;
 
 // Helper function for API calls
-async function apiCall<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-  const url = `${API_BASE_URL}${endpoint}`;
+async function apiCall<T>(endpoint: string, options: RequestInit = {}, serviceUrl?: string): Promise<T> {
+  const baseUrl = serviceUrl || API_BASE_URL;
+  const url = `${baseUrl}${endpoint}`;
   
   const defaultOptions: RequestInit = {
     headers: {
@@ -37,6 +44,26 @@ async function apiCall<T>(endpoint: string, options: RequestInit = {}): Promise<
     console.error(`API call failed for ${endpoint}:`, error);
     throw error;
   }
+}
+
+// Service-specific API calls
+async function serviceCall<T>(endpoint: string, options: RequestInit = {}, service: 'gateway' | 'core' | 'inventory' = 'gateway'): Promise<T> {
+  let serviceUrl: string;
+  
+  switch (service) {
+    case 'core':
+      serviceUrl = CORE_BACKEND_URL;
+      break;
+    case 'inventory':
+      serviceUrl = INVENTORY_SERVICE_URL;
+      break;
+    case 'gateway':
+    default:
+      serviceUrl = GATEWAY_URL;
+      break;
+  }
+  
+  return apiCall<T>(endpoint, options, serviceUrl);
 }
 
 // Mock data fallback for development
@@ -256,7 +283,7 @@ export async function getAssets(
   }
 
   try {
-    const response = await apiCall<any>('/api/assets');
+    const response = await serviceCall<any>('/api/v1/inventory', {}, 'gateway');
     return {
       data: response.data || [],
       pagination: response.pagination || { page, limit, total: response.data?.length || 0 },
@@ -277,7 +304,7 @@ export async function getAsset(id: string): Promise<Asset | null> {
   }
 
   try {
-    return await apiCall<Asset>(`/api/assets/${id}`);
+    return await serviceCall<Asset>(`/api/v1/inventory/${id}`, {}, 'gateway');
   } catch (error) {
     console.error('Failed to fetch asset from API, falling back to mock data');
     return mockAssets.find(asset => asset.id === id) || null;
@@ -301,10 +328,10 @@ export async function createAsset(data: AssetFormData): Promise<Asset> {
   }
 
   try {
-    return await apiCall<Asset>('/api/assets', {
+    return await serviceCall<Asset>('/api/v1/inventory', {
       method: 'POST',
       body: JSON.stringify(data),
-    });
+    }, 'gateway');
   } catch (error) {
     console.error('Failed to create asset via API');
     throw error;
@@ -328,10 +355,10 @@ export async function updateAsset(id: string, data: Partial<AssetFormData>): Pro
   }
 
   try {
-    return await apiCall<Asset>(`/api/assets/${id}`, {
+    return await serviceCall<Asset>(`/api/v1/inventory/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data),
-    });
+    }, 'gateway');
   } catch (error) {
     console.error('Failed to update asset via API');
     throw error;
@@ -350,9 +377,9 @@ export async function deleteAsset(id: string): Promise<boolean> {
   }
 
   try {
-    await apiCall<void>(`/api/assets/${id}`, {
+    await serviceCall<void>(`/api/v1/inventory/${id}`, {
       method: 'DELETE',
-    });
+    }, 'gateway');
     return true;
   } catch (error) {
     console.error('Failed to delete asset via API');

@@ -12,11 +12,13 @@
 #include <stdlib.h>
 #include <signal.h>
 #include <unistd.h>
+#include <string.h>
+#include <stdbool.h>
 #include "network/http_server.h"
 // #include "database/global_lib.h"  // Disabled until PostgreSQL is available
 
 #define DEFAULT_PORT 7234
-#define CONFIG_FILE "../config/server.conf"
+#define CONFIG_FILE "../../config/platform_config.json"
 
 static volatile int running = 1;
 
@@ -26,20 +28,77 @@ void signal_handler(int sig) {
     printf("\nShutdown signal received\n");
 }
 
+// Simple configuration parser for core backend
+typedef struct {
+    int port;
+    char host[256];
+    char database_host[256];
+    int database_port;
+    char database_name[256];
+    char database_user[256];
+    char service_discovery_host[256];
+    int service_discovery_port;
+    bool service_discovery_enabled;
+} core_config_t;
+
+void load_core_config(core_config_t *config, const char *config_file) {
+    // Initialize defaults
+    config->port = DEFAULT_PORT;
+    strncpy(config->host, "0.0.0.0", sizeof(config->host) - 1);
+    strncpy(config->database_host, "localhost", sizeof(config->database_host) - 1);
+    config->database_port = 5432;
+    strncpy(config->database_name, "infrastructure_platform", sizeof(config->database_name) - 1);
+    strncpy(config->database_user, "infrastructure_user", sizeof(config->database_user) - 1);
+    strncpy(config->service_discovery_host, "localhost", sizeof(config->service_discovery_host) - 1);
+    config->service_discovery_port = 8000;
+    config->service_discovery_enabled = true;
+    
+    // Load from environment variables
+    const char *env_port = getenv("CORE_BACKEND_PORT");
+    if (env_port) config->port = atoi(env_port);
+    
+    const char *env_host = getenv("CORE_BACKEND_HOST");
+    if (env_host) strncpy(config->host, env_host, sizeof(config->host) - 1);
+    
+    const char *env_db_host = getenv("DATABASE_HOST");
+    if (env_db_host) strncpy(config->database_host, env_db_host, sizeof(config->database_host) - 1);
+    
+    const char *env_db_port = getenv("DATABASE_PORT");
+    if (env_db_port) config->database_port = atoi(env_db_port);
+    
+    const char *env_sd_enabled = getenv("SERVICE_DISCOVERY_ENABLED");
+    if (env_sd_enabled) {
+        config->service_discovery_enabled = (strcmp(env_sd_enabled, "true") == 0);
+    }
+}
+
 int main(int argc, char *argv[]) {
-    int port = DEFAULT_PORT;
+    core_config_t config;
+    const char *config_file = CONFIG_FILE;
     
     // Parse command line arguments
     if (argc > 1) {
-        port = atoi(argv[1]);
-        if (port <= 0 || port > 65535) {
-            fprintf(stderr, "Invalid port number: %s\n", argv[1]);
-            return EXIT_FAILURE;
+        if (strcmp(argv[1], "--config") == 0 && argc > 2) {
+            config_file = argv[2];
+        } else {
+            config.port = atoi(argv[1]);
+            if (config.port <= 0 || config.port > 65535) {
+                fprintf(stderr, "Invalid port number: %s\n", argv[1]);
+                return EXIT_FAILURE;
+            }
         }
     }
     
+    // Load configuration
+    load_core_config(&config, config_file);
+    
     printf("Infrastructure Management Platform - Core Backend\n");
-    printf("Starting on port %d\n", port);
+    printf("Configuration:\n");
+    printf("  Host: %s\n", config.host);
+    printf("  Port: %d\n", config.port);
+    printf("  Database: %s:%d/%s\n", config.database_host, config.database_port, config.database_name);
+    printf("  Service Discovery: %s\n", config.service_discovery_enabled ? "enabled" : "disabled");
+    printf("Starting on port %d\n", config.port);
     
     // Setup signal handling
     signal(SIGINT, signal_handler);
@@ -55,11 +114,18 @@ int main(int argc, char *argv[]) {
     
     // printf("Database connection established\n");
     
+    // TODO: Register with service discovery if enabled
+    if (config.service_discovery_enabled) {
+        printf("Service discovery enabled - would register with %s:%d\n",
+               config.service_discovery_host, config.service_discovery_port);
+        // TODO: Implement service registration
+    }
+    
     // TODO: Initialize HTTP server with routes
     // TODO: Setup API handlers
     // TODO: Start server loop
     
-    printf("Core backend running on port %d\n", port);
+    printf("Core backend running on port %d\n", config.port);
     printf("Press Ctrl+C to stop\n");
     
     // Main server loop
@@ -69,6 +135,11 @@ int main(int argc, char *argv[]) {
     }
     
     printf("Shutting down core backend...\n");
+    
+    // TODO: Unregister from service discovery
+    if (config.service_discovery_enabled) {
+        printf("Would unregister from service discovery\n");
+    }
     
     // TODO: Cleanup database connection
     // database_disconnect(database);
