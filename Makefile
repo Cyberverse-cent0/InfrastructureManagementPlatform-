@@ -22,6 +22,7 @@ endif
 # Directories
 SRC_DIR = scipts
 INSTALLER_DIR = installer
+BACKEND_DIR = src/backend/core
 BUILD_DIR = build
 TEST_DIR = test
 
@@ -33,6 +34,7 @@ GET_THREAD_SRC = $(SRC_DIR)/get_thead.c
 SMART_LOGGER_SRC = $(SRC_DIR)/smart_logger.c
 ASYNC_LOGGER_SRC = $(SRC_DIR)/async_logger.c
 INSTALLER_SRC = $(INSTALLER_DIR)/postgress_setup.c
+HTTP_SERVER_SRC = $(BACKEND_DIR)/http_server.c
 
 # Object files
 LOGGER_OBJ = $(BUILD_DIR)/logger.o
@@ -42,11 +44,14 @@ GET_THREAD_OBJ = $(BUILD_DIR)/get_thead.o
 SMART_LOGGER_OBJ = $(BUILD_DIR)/smart_logger.o
 ASYNC_LOGGER_OBJ = $(BUILD_DIR)/async_logger.o
 INSTALLER_OBJ = $(BUILD_DIR)/postgress_setup.o
+HTTP_SERVER_OBJ = $(BUILD_DIR)/http_server.o
 
 # Targets
 INSTALLER_TARGET = $(BUILD_DIR)/installer$(EXE_EXT)
 LOGGER_TARGET = $(BUILD_DIR)/logger_test$(EXE_EXT)
 PRINT_FUNC_TARGET = $(BUILD_DIR)/print_test$(EXE_EXT)
+HTTP_SERVER_TARGET = $(BUILD_DIR)/http_server$(EXE_EXT)
+NETWORK_TEST_TARGET = $(BUILD_DIR)/test_network$(EXE_EXT)
 
 # PostgreSQL library (optional)
 ifdef USE_POSTGRES
@@ -88,6 +93,36 @@ test_threading: directories $(BUILD_DIR)/test_threading
 $(BUILD_DIR)/test_threading: test_threading_integration.c $(LOGGER_OBJ) $(PRINT_FUNC_OBJ) $(USER_DB_OBJ) $(GET_THREAD_OBJ) $(SMART_LOGGER_OBJ) $(ASYNC_LOGGER_OBJ)
 	$(CC) $(CFLAGS) -o $@ $< $(LOGGER_OBJ) $(PRINT_FUNC_OBJ) $(USER_DB_OBJ) $(GET_THREAD_OBJ) $(SMART_LOGGER_OBJ) $(ASYNC_LOGGER_OBJ) $(PLATFORM_LIBS)
 
+# HTTP server target
+http_server: directories $(HTTP_SERVER_TARGET)
+
+$(HTTP_SERVER_TARGET): $(HTTP_SERVER_OBJ) $(LOGGER_OBJ) $(PRINT_FUNC_OBJ)
+	$(CC) $(CFLAGS) -o $@ $^ $(PLATFORM_LIBS)
+
+# Network interface test
+test_network: directories $(NETWORK_TEST_TARGET)
+
+$(NETWORK_TEST_TARGET): test_network_interface.c $(HTTP_SERVER_OBJ) $(LOGGER_OBJ) $(PRINT_FUNC_OBJ)
+	$(CC) $(CFLAGS) -o $@ $< $(HTTP_SERVER_OBJ) $(LOGGER_OBJ) $(PRINT_FUNC_OBJ) $(PLATFORM_LIBS)
+
+# Server logging test
+test_logging: directories $(BUILD_DIR)/test_logging
+
+$(BUILD_DIR)/test_logging: test_server_logging.c $(HTTP_SERVER_OBJ) $(LOGGER_OBJ) $(PRINT_FUNC_OBJ)
+	$(CC) $(CFLAGS) -o $@ $< $(HTTP_SERVER_OBJ) $(LOGGER_OBJ) $(PRINT_FUNC_OBJ) $(PLATFORM_LIBS)
+
+# HTTP parsing test
+test_http: directories $(BUILD_DIR)/test_http
+
+$(BUILD_DIR)/test_http: test_http_parsing.c $(HTTP_SERVER_OBJ) $(LOGGER_OBJ) $(PRINT_FUNC_OBJ)
+	$(CC) $(CFLAGS) -o $@ $< $(HTTP_SERVER_OBJ) $(LOGGER_OBJ) $(PRINT_FUNC_OBJ) $(PLATFORM_LIBS)
+
+# Routing test
+test_routing: directories $(BUILD_DIR)/test_routing
+
+$(BUILD_DIR)/test_routing: test_routing.c $(HTTP_SERVER_OBJ) $(LOGGER_OBJ) $(PRINT_FUNC_OBJ)
+	$(CC) $(CFLAGS) -o $@ $< $(HTTP_SERVER_OBJ) $(LOGGER_OBJ) $(PRINT_FUNC_OBJ) $(PLATFORM_LIBS)
+
 # Object files
 $(INSTALLER_OBJ): $(INSTALLER_SRC) $(INSTALLER_DIR)/postgress_setup.h $(SRC_DIR)/get_thead.h
 	$(CC) $(CFLAGS) -c $< -o $@
@@ -108,6 +143,9 @@ $(SMART_LOGGER_OBJ): $(SMART_LOGGER_SRC) $(SRC_DIR)/smart_logger.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(ASYNC_LOGGER_OBJ): $(ASYNC_LOGGER_SRC) $(SRC_DIR)/async_logger.h
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(HTTP_SERVER_OBJ): $(HTTP_SERVER_SRC) $(BACKEND_DIR)/http_server.h $(LOGGER_OBJ) $(PRINT_FUNC_OBJ)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # Debug build
@@ -173,6 +211,11 @@ help:
 	@echo "Available targets:"
 	@echo "  all           - Build the installer (default)"
 	@echo "  installer     - Build the installer"
+	@echo "  http_server   - Build the HTTP server"
+	@echo "  test_network  - Build and test network interface discovery"
+	@echo "  test_logging  - Build and test server logging functionality"
+	@echo "  test_http     - Build and test HTTP parsing functionality"
+	@echo "  test_routing  - Build and test routing system"
 	@echo "  debug         - Build with debug symbols"
 	@echo "  release       - Build optimized release"
 	@echo "  test_compile  - Compile test programs"
@@ -181,5 +224,5 @@ help:
 	@echo "  install_deps  - Install system dependencies"
 	@echo "  help          - Show this help message"
 
-.PHONY: all installer debug release test_compile test_run clean depedecy_manager install_deps frontend frontend_run backend backend_run help directories
+.PHONY: all installer http_server test_network test_logging test_http test_routing debug release test_compile test_run clean depedecy_manager install_deps frontend frontend_run backend backend_run help directories
 	
