@@ -1,0 +1,93 @@
+{
+  "version": "1.0.0",
+  "environment": "development",
+  "deployment_mode": "flexible",
+  "services": {
+    "gateway": {
+      "name": "api-gateway",
+      "host": "localhost",
+      "port": 8000,
+      "protocol": "http",
+      "health_check_endpoint": "/health",
+      "metadata": {
+        "description": "API Gateway for frontend-backend communication",
+        "type": "gateway"
+      }
+    },
+    "core_backend": {
+      "name": "core-backend",
+      "host": "localhost",
+      "port": 8080,
+      "protocol": "http",
+      "health_check_endpoint": "/health",
+      "metadata": {
+        "description": "Core C-based backend service",
+        "type": "backend"
+      }
+    },
+    "inventory_service": {
+      "name": "inventory-microservice",
+      "host": "localhost",
+      "port": 8081,
+      "protocol": "http",
+      "health_check_endpoint": "/health",
+      "metadata": {
+        "description": "Inventory management microservice",
+        "type": "microservice"
+      }
+    },
+    "postgres": {
+      "name": "postgres-database",
+      "host": "localhost",
+      "port": 5432,
+      "protocol": "postgresql",
+      "health_check_endpoint": null,
+      "metadata": {
+        "description": "PostgreSQL database server",
+        "type": "database"
+      }
+    },
+    "frontend": {
+      "name": "nextjs-frontend",
+      "host": "localhost",
+      "port": 3000,
+      "protocol": "http",
+      "health_check_endpoint": null,
+      "metadata": {
+        "description": "Next.js frontend application",
+        "type": "frontend"
+      }
+    }
+  },
+  "service_discovery": {
+    "enabled": true,
+    "registry_file": "data/service_registry.json",
+    "health_check_interval": 30,
+    "service_timeout": 120,
+    "auto_register": true
+  },
+  "network": {
+    "dns_resolution": true,
+    "connection_timeout": 10,
+    "retry_attempts": 3,
+    "retry_delay": 1
+  },
+  "deployment_scenarios": {
+    "single_machine": {
+      "description": "All services on the same machine",
+      "gateway": {"host": "localhost", "port": 8000},
+      "core_backend": {"host": "localhost", "port": 8080},
+      "inventory_service": {"host": "localhost", "port": 8081},
+      "postgres": {"host": "localhost", "port": 5432},
+      "frontend": {"host": "localhost", "port": 3000}
+    },
+    "distributed": {
+      "description": "Services distributed across multiple machines",
+      "gateway": {"host": "GATEWAY_HOST", "port": 8000},
+      "core_backend": {"host": "CORE_BACKEND_HOST", "port": 8080},
+      "inventory_service": {"host": "INVENTORY_SERVICE_HOST", "port": 8081},
+      "postgres": {"host": "POSTGRES_HOST", "port": 5432},
+      "frontend": {"host": "FRONTEND_HOST", "port": 3000}
+    }
+  }
+}

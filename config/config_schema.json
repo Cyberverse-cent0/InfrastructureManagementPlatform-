@@ -1,0 +1,111 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Platform Configuration Schema",
+  "type": "object",
+  "required": ["version", "environment", "services"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Configuration version in semver format"
+    },
+    "environment": {
+      "type": "string",
+      "enum": ["development", "staging", "production"],
+      "description": "Deployment environment"
+    },
+    "deployment_mode": {
+      "type": "string",
+      "enum": ["single_machine", "distributed", "flexible"],
+      "description": "Deployment mode"
+    },
+    "services": {
+      "type": "object",
+      "description": "Service definitions",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["name", "host", "port", "protocol"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Service name"
+          },
+          "host": {
+            "type": "string",
+            "description": "Service hostname or IP address"
+          },
+          "port": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 65535,
+            "description": "Service port number"
+          },
+          "protocol": {
+            "type": "string",
+            "enum": ["http", "https", "postgresql", "grpc"],
+            "description": "Communication protocol"
+          },
+          "health_check_endpoint": {
+            "type": ["string", "null"],
+            "description": "Health check endpoint path"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Additional service metadata"
+          }
+        }
+      }
+    },
+    "service_discovery": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Enable service discovery"
+        },
+        "registry_file": {
+          "type": "string",
+          "description": "Path to service registry file"
+        },
+        "health_check_interval": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Health check interval in seconds"
+        },
+        "service_timeout": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Service timeout in seconds"
+        },
+        "auto_register": {
+          "type": "boolean",
+          "description": "Auto-register services on startup"
+        }
+      }
+    },
+    "network": {
+      "type": "object",
+      "properties": {
+        "dns_resolution": {
+          "type": "boolean",
+          "description": "Enable DNS resolution"
+        },
+        "connection_timeout": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Connection timeout in seconds"
+        },
+        "retry_attempts": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of connection retry attempts"
+        },
+        "retry_delay": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Delay between retries in seconds"
+        }
+      }
+    }
+  }
+}
